@@ -1,6 +1,4 @@
 <launch>
-  <node pkg="" type="" name=""  output="">
-  </node>
-  <node pkg="" type="" name="" output="">
+  <node pkg="RoboticsTeam31" type="task1pub" name="task1"  output="screen">
   </node>
 </launch>
