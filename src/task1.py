@@ -10,7 +10,7 @@ class Square:
     def callback_function(self, odom_data):
         # obtain the orientation and position co-ords:
         or_x = odom_data.pose.pose.orientation.x
-        or_y = odom_data.pose.pose.orientation.ygit
+        or_y = odom_data.pose.pose.orientation.y
         or_z = odom_data.pose.pose.orientation.z
         or_w = odom_data.pose.pose.orientation.w
         pos_x = odom_data.pose.pose.position.x
@@ -30,7 +30,7 @@ class Square:
             self.theta_z0 = self.theta_z
 
     def __init__(self):
-        node_name = "move_square"
+        node_name = "move_circle"
         
         self.startup = True
         self.turn = False
@@ -39,7 +39,7 @@ class Square:
         self.sub = rospy.Subscriber('odom', Odometry, self.callback_function)
 
         rospy.init_node(node_name, anonymous=True)
-        self.rate = rospy.Rate(10) # hz
+        self.rate = rospy.Rate(1) # hz
 
         self.x = 0.0
         self.y = 0.0
