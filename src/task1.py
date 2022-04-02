@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from itertools import filterfalse
 import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
@@ -15,6 +16,7 @@ class Square:
         or_w = odom_data.pose.pose.orientation.w
         pos_x = odom_data.pose.pose.position.x
         pos_y = odom_data.pose.pose.position.y
+        print(f"x = '{pos_x:.3f}', y = '{pos_y:.3f}', theta_z = '{or_w:.3f}'")
 
         # convert orientation co-ords to roll, pitch & yaw (theta_x, theta_y, theta_z):
         (roll, pitch, yaw) = euler_from_quaternion([or_x, or_y, or_z, or_w], 'sxyz')
@@ -58,48 +60,47 @@ class Square:
     def shutdownhook(self):
         self.pub.publish(Twist())
         self.ctrl_c = True
-    
-    def print_stuff(self, a_message):
-        print(a_message)
-        print(f"current velocity: lin.x = {self.vel.linear.x:.1f}, ang.z = {self.vel.angular.z:.1f}")
-        print(f"current odometry: x = {self.x:.3f}, y = {self.y:.3f}, theta_z = {self.theta_z:.3f}")
 
     def main_loop(self):
-        status = ""
         wait = 0
         while not self.ctrl_c:
             if self.startup:
                 self.vel = Twist()
-                status = "init"
             elif self.turn:
-                if abs(self.theta_z0 - self.theta_z) >= pi/2 and wait > 5:
+                if abs(self.x0 - self.x) <= 0.055 and wait > 4:
                     # If the robot has turned 90 degrees (in radians) then stop turning
-                    self.turn = False
-                    self.vel = Twist()
-                    self.theta_z0 = self.theta_z
-                    status = "turn-fwd transition"
-                    wait = 0
+                    #self.vel.linear.x = 0
+                    #self.vel.angular.z = 0 # rad/s
+                    self.ctrl_c = True
                 else:
                     self.vel = Twist()
-                    self.vel.angular.z = 0.2
-                    status = "turning"
+                    path_rad = 0.5 # m
+                    lin_vel = 0.1 # m/s
                     wait += 1
+                    
+                    self.vel.linear.x = lin_vel
+                    self.vel.angular.z = -(lin_vel / path_rad) # rad/s
             else:
-                if sqrt(pow(self.x0 - self.x, 2) + pow(self.y0 - self.y, 2)) >= 0.5:
+                if abs(self.x0 - self.x) <= 0.008 and wait > 4:
                     # if distance travelled is greater than 0.5m then stop, and start turning:
                     self.vel = Twist()
                     self.turn = True
+                    # self.vel.linear.x = 0
+                    # self.vel.angular.z = 0 # rad/s
                     self.x0 = self.x
                     self.y0 = self.y
-                    status = "fwd-turn transition"
+                    wait = 0
                 else:
                     self.vel = Twist()
-                    self.vel.linear.x = 0.1
-                    status = "moving forwards"
-            self.pub.publish(self.vel)
-            self.print_stuff(status)
-            self.rate.sleep()
+                    path_rad = 0.5 # m
+                    lin_vel = 0.1 # m/s
+                    wait += 1
 
+                    self.vel.linear.x = lin_vel
+                    self.vel.angular.z = lin_vel / path_rad # rad/s
+            self.pub.publish(self.vel)
+            self.rate.sleep()
+            
 if __name__ == '__main__':
     movesquare_instance = Square()
     try:
