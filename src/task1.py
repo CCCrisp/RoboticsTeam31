@@ -5,7 +5,7 @@ import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
-from math import sqrt, pow, pi
+from math import sqrt, pow, pi, degrees
 
 class Square:
     def callback_function(self, odom_data):
@@ -16,7 +16,7 @@ class Square:
         or_w = odom_data.pose.pose.orientation.w
         pos_x = odom_data.pose.pose.position.x
         pos_y = odom_data.pose.pose.position.y
-        print(f"x = '{pos_x:.3f}', y = '{pos_y:.3f}', theta_z = '{or_w:.3f}'")
+        print(f"x = '{pos_x:.2f}' m, y = '{pos_y:.2f}' m, theta_z = '{round(degrees(or_w), 1)} degrees'")
 
         # convert orientation co-ords to roll, pitch & yaw (theta_x, theta_y, theta_z):
         (roll, pitch, yaw) = euler_from_quaternion([or_x, or_y, or_z, or_w], 'sxyz')
