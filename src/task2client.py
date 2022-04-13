@@ -41,12 +41,12 @@ class action_client(object):
         self.client.send_goal(self.goal, feedback_cb=self.feedback_callback)
 
     def main(self):
-        self.send_goal(velocity = 0.1, approach = 0.1)
+        self.send_goal(velocity = 0.1, approach = 0.5)
         prempt = False
         while self.client.get_state() < 2:
             print(f"FEEDBACK: Currently travelled {self.distance:.3f} m, "
                     f"STATE: Current state code is {self.client.get_state()}")
-            if self.distance >= 2:
+            if self.distance >= 10:
                 rospy.logwarn("Cancelling goal now...")
                 self.client.cancel_goal()
                 rospy.logwarn("Goal Cancelled")
