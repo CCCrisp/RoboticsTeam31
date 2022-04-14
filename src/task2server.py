@@ -13,6 +13,7 @@ from tb3 import Tb3Move, Tb3Odometry, Tb3LaserScan
 # Import some other useful Python Modules
 from math import sqrt, pow
 import numpy as np
+import time
 
 class SearchActionServer(object):
     feedback = SearchFeedback() 
@@ -66,26 +67,38 @@ class SearchActionServer(object):
         self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
         self.vel_controller.publish()
 
+        self.tb3_lidar.TurnLeft = False
         while success:
-            if self.tb3_lidar.min_distance <= goal.approach_distance:
+            if self.tb3_lidar.min_distance > goal.approach_distance:
+                turning = 0
+                goal.fwd_velocity = 0.4
+                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                self.vel_controller.publish()
+                
+            elif self.tb3_lidar.TurnLeft: 
+                turning = 0.2
+                goal.fwd_velocity = 0.0
+                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                self.vel_controller.publish()
+                time.sleep(1)
+
+            else :
                 turning = -0.2
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-            else: 
-                turning = 0
-                goal.fwd_velocity = 0.2
-                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
-                self.vel_controller.publish()
-                # check if there has been a request to cancel the action mid-way through:
-                if self.actionserver.is_preempt_requested():
-                    rospy.loginfo("Cancelling the camera sweep.")
-                    self.actionserver.set_preempted()
-                    # stop the robot:
-                    self.vel_controller.stop()
-                    success = False
-                    # exit the loop:
-                    break
+                time.sleep(1)
+            
+            
+            # check if there has been a request to cancel the action mid-way through:
+            if self.actionserver.is_preempt_requested():
+                rospy.loginfo("Cancelling the camera sweep.")
+                self.actionserver.set_preempted()
+                # stop the robot:
+                self.vel_controller.stop()
+                success = False
+                # exit the loop:
+                break
             
             self.distance = sqrt(pow(self.posx0 - self.tb3_odom.posx, 2) + pow(self.posy0 - self.tb3_odom.posy, 2))
             # populate the feedback message and publish it:
