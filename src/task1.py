@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from itertools import filterfalse
+import secrets
 import rospy
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
@@ -63,38 +64,34 @@ class Square:
 
     def main_loop(self):
         wait = 0
+        StartTime = rospy.get_rostime()
         while not self.ctrl_c:
             if self.startup:
                 self.vel = Twist()
             elif self.turn:
-                if abs(self.x0 - self.x) <= 0.055 and self.y>0:
+                if round(abs(self.x0 - self.x),3) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 55:
                     # If the robot has turned 90 degrees (in radians) then stop turning
-                    #self.vel.linear.x = 0
-                    #self.vel.angular.z = 0 # rad/s
+                    # self.vel.angular.z = 0 # rad/s
                     self.ctrl_c = True
                 else:
                     self.vel = Twist()
                     path_rad = 0.5 # m
                     lin_vel = 0.1 # m/s
-                    wait += 1
                     
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = -(lin_vel / path_rad) # rad/s
             else:
-                if abs(self.x0 - self.x) <= 0.008 and self.y>0:
+                if round(abs(self.x0 - self.x),3) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 25:
                     # if distance travelled is greater than 0.5m then stop, and start turning:
                     self.vel = Twist()
                     self.turn = True
-                    # self.vel.linear.x = 0
                     # self.vel.angular.z = 0 # rad/s
                     self.x0 = self.x
                     self.y0 = self.y
-                    wait = 0
                 else:
                     self.vel = Twist()
                     path_rad = 0.5 # m
                     lin_vel = 0.1 # m/s
-                    wait += 1
 
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = lin_vel / path_rad # rad/s
