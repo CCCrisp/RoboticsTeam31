@@ -67,7 +67,7 @@ class Square:
             if self.startup:
                 self.vel = Twist()
             elif self.turn:
-                if abs(self.x0 - self.x) <= 0.055 and wait > 4:
+                if abs(self.x0 - self.x) <= 0.055 and self.y>0:
                     # If the robot has turned 90 degrees (in radians) then stop turning
                     #self.vel.linear.x = 0
                     #self.vel.angular.z = 0 # rad/s
@@ -81,7 +81,7 @@ class Square:
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = -(lin_vel / path_rad) # rad/s
             else:
-                if abs(self.x0 - self.x) <= 0.008 and wait > 4:
+                if abs(self.x0 - self.x) <= 0.008 and self.y>0:
                     # if distance travelled is greater than 0.5m then stop, and start turning:
                     self.vel = Twist()
                     self.turn = True
@@ -99,7 +99,7 @@ class Square:
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = lin_vel / path_rad # rad/s
             self.pub.publish(self.vel)
-            self.rate.sleep()
+            
             
 if __name__ == '__main__':
     movesquare_instance = Square()
