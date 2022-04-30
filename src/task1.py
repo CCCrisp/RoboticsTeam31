@@ -8,7 +8,7 @@ from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
 from math import sqrt, pow, pi, degrees
 
-class Square:
+class task1:
     def callback_function(self, odom_data):
         # obtain the orientation and position co-ords:
         or_x = odom_data.pose.pose.orientation.x
@@ -17,7 +17,7 @@ class Square:
         or_w = odom_data.pose.pose.orientation.w
         pos_x = odom_data.pose.pose.position.x
         pos_y = odom_data.pose.pose.position.y
-        print(f"x = '{pos_x:.2f}' m, y = '{pos_y:.2f}' m, theta_z = '{round(degrees(or_w), 1)} degrees'")
+        print(f"x = '{pos_x:.2f}' [m], y = '{pos_y:.2f}' [m], theta_z = '{round(degrees(or_w), 1)} [degrees]'")
 
         # convert orientation co-ords to roll, pitch & yaw (theta_x, theta_y, theta_z):
         (roll, pitch, yaw) = euler_from_quaternion([or_x, or_y, or_z, or_w], 'sxyz')
@@ -34,9 +34,6 @@ class Square:
 
     def __init__(self):
         node_name = "move_circle"
-        
-        self.startup = True
-        self.turn = False
 
         self.pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
         self.sub = rospy.Subscriber('odom', Odometry, self.callback_function)
@@ -53,10 +50,13 @@ class Square:
         
         self.vel = Twist()
 
+        self.startup = True
+        self.turn = False
         self.ctrl_c = False
         rospy.on_shutdown(self.shutdownhook)
 
         rospy.loginfo(f"the {node_name} node has been initialised...")
+
 
     def shutdownhook(self):
         self.pub.publish(Twist())
@@ -69,8 +69,8 @@ class Square:
             if self.startup:
                 self.vel = Twist()
             elif self.turn:
-                if round(abs(self.x0 - self.x),3) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 55:
-                    # If the robot has turned then stop turning
+                if round(abs(self.x0 - self.x),4) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 55:
+                    # If the robot has turned 90 degrees (in radians) then stop turning
                     # self.vel.angular.z = 0 # rad/s
                     self.ctrl_c = True
                 else:
@@ -81,17 +81,18 @@ class Square:
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = -(lin_vel / path_rad) # rad/s
             else:
-                if round(abs(self.x0 - self.x),3) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 25:
+                if round(abs(self.x0 - self.x),4) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 25:
                     # if distance travelled is greater than 0.5m then stop, and start turning:
                     self.vel = Twist()
                     self.turn = True
                     # self.vel.angular.z = 0 # rad/s
-                    self.x0 = self.x
-                    self.y0 = self.y
+                    
                 else:
                     self.vel = Twist()
                     path_rad = 0.5 # m
                     lin_vel = 0.1 # m/s
+                    #print (round(abs(self.x - self.x0),4))
+                    print (self.x0)
 
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = lin_vel / path_rad # rad/s
@@ -99,7 +100,7 @@ class Square:
             
             
 if __name__ == '__main__':
-    movesquare_instance = Square()
+    movesquare_instance = task1()
     try:
         movesquare_instance.main_loop()
     except rospy.ROSInterruptException:
