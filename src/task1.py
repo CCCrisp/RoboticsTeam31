@@ -69,7 +69,7 @@ class Square:
             if self.startup:
                 self.vel = Twist()
             elif self.turn:
-                if round(abs(self.x0 - self.x),3) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 55:
+                if round(abs(self.x0 - self.x),4) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 55:
                     # If the robot has turned 90 degrees (in radians) then stop turning
                     # self.vel.angular.z = 0 # rad/s
                     self.ctrl_c = True
@@ -81,7 +81,7 @@ class Square:
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = -(lin_vel / path_rad) # rad/s
             else:
-                if round(abs(self.x0 - self.x),3) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 25:
+                if round(abs(self.x0 - self.x),4) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 25:
                     # if distance travelled is greater than 0.5m then stop, and start turning:
                     self.vel = Twist()
                     self.turn = True
