@@ -3,6 +3,7 @@
 from itertools import filterfalse
 import secrets
 import rospy
+import time
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion
@@ -34,6 +35,8 @@ class task1:
 
     def __init__(self):
         node_name = "move_circle"
+        self.startup = True
+        self.turn = False
 
         self.pub = rospy.Publisher('cmd_vel', Twist, queue_size=10)
         self.sub = rospy.Subscriber('odom', Odometry, self.callback_function)
@@ -64,14 +67,18 @@ class task1:
 
     def main_loop(self):
         wait = 0
-        StartTime = rospy.get_rostime()
+        StartTime = time.time()
         while not self.ctrl_c:
             if self.startup:
                 self.vel = Twist()
             elif self.turn:
-                if round(abs(self.x0 - self.x),4) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 55:
+                if round(abs(self.x0 - self.x),4) <= 0.001 and (time.time()-StartTime) > 55:
                     # If the robot has turned 90 degrees (in radians) then stop turning
-                    # self.vel.angular.z = 0 # rad/s
+                    self.vel = Twist()
+                    self.vel.linear.x = 0
+                    self.vel.angular.z = 0 # rad/s
+                    self.turn = False
+                    StartTime = time.time()
                     self.ctrl_c = True
                 else:
                     self.vel = Twist()
@@ -81,7 +88,7 @@ class task1:
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = -(lin_vel / path_rad) # rad/s
             else:
-                if round(abs(self.x0 - self.x),4) <= 0.001 and (rospy.get_rostime().secs-StartTime.secs) > 25:
+                if round(abs(self.x0 - self.x),4) <= 0.001 and (time.time()-StartTime) > 25:
                     # if distance travelled is greater than 0.5m then stop, and start turning:
                     self.vel = Twist()
                     self.turn = True
@@ -92,7 +99,8 @@ class task1:
                     path_rad = 0.5 # m
                     lin_vel = 0.1 # m/s
                     #print (round(abs(self.x - self.x0),4))
-                    print (self.x0)
+                    #print (self.x0)
+                    #print (StartTime)
 
                     self.vel.linear.x = lin_vel
                     self.vel.angular.z = lin_vel / path_rad # rad/s
