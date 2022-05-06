@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find turtlebot3_slam)/launch/turtlebot3_slam.launch" />
+    <node pkg="rob" type="task5server.py" name="task5server"  output="screen">
+    </node>
+    <node pkg="rob" type="task5client.py" name="task5client" output="screen">
+    </node>
+</launch>
