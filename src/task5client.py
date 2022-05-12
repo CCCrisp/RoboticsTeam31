@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import atexit
 from curses.ascii import ctrl
 import rospy
 import actionlib
@@ -42,16 +43,29 @@ class action_client(object):
         self.client.send_goal(self.goal, feedback_cb=self.feedback_callback)
 
     def main(self):
-        package = 'map_server'
-        exe = 'map_saver'
-        node = roslaunch.core.Node(package, exe, args='home/student/catkin_ws/src/rob/maps/ -f task5_map')
-        self.send_goal(velocity = 0.1, approach = 0.35)
-        #while not self.ctrl_c:
-        #    continue
+        
+        self.send_goal(velocity = 0.15, approach = 0.35)
+        
+        while not self.ctrl_c:
+            continue
+        rospy.loginfo("stopping")
+
+        node = roslaunch.core.Node('map_server', 'map_saver', args='home/student/catkin_ws/src/RoboticsTeam31/maps/ -f task5_map')
         launch = roslaunch.scriptapi.ROSLaunch()
-        launch.start()  
-        process = launch.launch(node)
-        process.stop()
+        launch.start()
+        launch.launch(node)
+        
+        self.shutdown_ops
+    
+    def exit_handler():
+        node = roslaunch.core.Node('map_server', 'map_saver', args='home/student/catkin_ws/src/RoboticsTeam31/maps/ -f task5_map')
+        launch = roslaunch.scriptapi.ROSLaunch()
+        launch.start()
+        launch.launch(node)
+
+
+    atexit.register(exit_handler)
+        
         
 
 if __name__ == '__main__':

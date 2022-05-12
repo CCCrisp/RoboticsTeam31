@@ -30,8 +30,8 @@ class SearchActionServer(object):
         self.start_time = rospy.get_time()
     
     def scan_callback(self, scan_data):
-        left_arc = scan_data.ranges[0:10]
-        right_arc = scan_data.ranges[-10:]
+        left_arc = scan_data.ranges[0:5]
+        right_arc = scan_data.ranges[-5:]
         front_arc = np.array(left_arc[::-1] + right_arc[::-1])
         self.min_distance = front_arc.min()
         self.object_angle = self.arc_angles[np.argmin(front_arc)]
@@ -64,18 +64,17 @@ class SearchActionServer(object):
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-                time.sleep(1)
 
             else :
                 turning = -0.2
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-                time.sleep(1)
+                
             
             
-            # canccel if the time has elapsed
-            if rospy.get_time() - self.start_time >= 20:
+            # cancel if the time has elapsed
+            if rospy.get_time() - self.start_time >= 10:
                 break
             
             self.distance = sqrt(pow(self.posx0 - self.tb3_odom.posx, 2) + pow(self.posy0 - self.tb3_odom.posy, 2))
