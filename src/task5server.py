@@ -64,17 +64,18 @@ class SearchActionServer(object):
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
+                time.sleep(1)
 
             else :
                 turning = -0.2
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-                
+                time.sleep(1)
             
             
             # cancel if the time has elapsed
-            if rospy.get_time() - self.start_time >= 10:
+            if rospy.get_time() - self.start_time >= 180:
                 break
             
             self.distance = sqrt(pow(self.posx0 - self.tb3_odom.posx, 2) + pow(self.posy0 - self.tb3_odom.posy, 2))
