@@ -12,7 +12,10 @@ from sensor_msgs.msg import Image
 
 # Import some other modules from within this package
 from tb3 import Tb3Move
+<<<<<<< HEAD
 from geometry_msgs.msg import Twist
+=======
+>>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
 class colour_search(object):
 
@@ -22,7 +25,10 @@ class colour_search(object):
 
         self.camera_subscriber = rospy.Subscriber("/camera/rgb/image_raw",
             Image, self.camera_callback)
+<<<<<<< HEAD
         self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, self.callback_lidar)
+=======
+>>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
         self.cvbridge_interface = CvBridge()
 
         self.robot_controller = Tb3Move()
@@ -32,9 +38,12 @@ class colour_search(object):
 
         self.move_rate = "" # fast, slow or stop
         self.stop_counter = 0
+<<<<<<< HEAD
         self.cvbridge_interface 
 
         self.vel = Twist()
+=======
+>>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
         self.ctrl_c = False
         rospy.on_shutdown(self.shutdown_ops)
@@ -44,9 +53,16 @@ class colour_search(object):
         self.m00 = 0
         self.m00_min = 10000
 
+<<<<<<< HEAD
         # Thresholds for ["Blue", "Red", "Green", "Turquoise", "Purple", "Yellow"]
         self.lower = [(115, 224, 100), (0, 185, 100), (25, 150, 100), (75, 150, 100), (148, 150, 100), (25, 150, 100)]
         self.upper = [(130, 255, 255), (10, 255, 255), (70, 255, 255), (100, 255, 255), (150, 250, 255), (30, 190, 255)]
+=======
+        # Thresholds for ["Blue", "Red", "Green", "Turquoise", "Purple"]
+        # Threshold values received by looking at each pillar then generating the image (the rqt_image_view one) and its own plot
+        self.lower = [(115, 224, 100), (0, 185, 100), (25, 150, 100), (75, 150, 100), (148, 150, 100)]
+        self.upper = [(130, 255, 255), (10, 255, 255), (70, 255, 255), (100, 255, 255), (150, 250, 255)]
+>>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
     def shutdown_ops(self):
         self.robot_controller.stop()
@@ -117,7 +133,11 @@ class colour_search(object):
 
             elif self.move_rate == 'stop' and self.stop_counter > 0:
                 print(f"STOPPED: The blob of colour is now dead-ahead at y-position {self.cy:.0f} pixels... Counting down: {self.stop_counter}")
+<<<<<<< HEAD
                 self.robot_controller.set_move_cmd(0.0, self.move_forward)
+=======
+                self.robot_controller.set_move_cmd(0.0, 0.0)
+>>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
             else:
                 print(f"MOVING SLOW: A blob of colour of size {self.m00:.0f} pixels is in view at y-position: {self.cy:.0f} pixels.")
@@ -125,9 +145,12 @@ class colour_search(object):
             
             self.robot_controller.publish()
             self.rate.sleep()
+<<<<<<< HEAD
 
     def move_forward(self):
         self.vel.linear.x = 0.3
+=======
+>>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
             
 if __name__ == '__main__':
     search_instance = colour_search()

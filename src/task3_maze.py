@@ -115,7 +115,11 @@ class Task3Maze():
     def find_wall(self): 
         self.vel = Twist()
         self.vel.linear.x = 0.1
+<<<<<<< HEAD
         # self.vel.angular.z = -0.2
+=======
+        self.vel.angular.z = -0.2
+>>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
 
     def turn_left(self):
