@@ -32,6 +32,10 @@ class action_client(object):
 
     def shutdown_ops(self):
         self.client.cancel_goal()
+        node = roslaunch.core.Node('map_server', 'map_saver', args='home/student/catkin_ws/src/RoboticsTeam31/maps/ -f task5_map')
+        launch = roslaunch.scriptapi.ROSLaunch()
+        launch.start()
+        launch.launch(node)
         self.ctrl_c = True
             
             
@@ -44,7 +48,7 @@ class action_client(object):
 
     def main(self):
         
-        self.send_goal(velocity = 0.15, approach = 0.35)
+        self.send_goal(velocity = 0.15, approach = 0.275)
         
         while not self.ctrl_c:
             continue

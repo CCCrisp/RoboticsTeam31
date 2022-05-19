@@ -1,6 +1,6 @@
 <launch>
-    <node pkg="RoboticsTeam31" type="task2server.py" name="task2server"  output="screen">
+    <node pkg="team31" type="task2server.py" name="task2server"  output="screen">
     </node>
-    <node pkg="RoboticsTeam31" type="task2clinet.py" name="task2client" output="screen">
+    <node pkg="team31" type="task2client.py" name="task2client" output="screen">
     </node>
 </launch>
