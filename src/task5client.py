@@ -44,13 +44,13 @@ class action_client(object):
 
     def main(self):
         
-        self.send_goal(velocity = 0.15, approach = 0.35)
+        self.send_goal(velocity = 0.15, approach = 0.45)
         
         while not self.ctrl_c:
             continue
         rospy.loginfo("stopping")
 
-        node = roslaunch.core.Node('map_server', 'map_saver', args='$(find team31)/maps -f task5_map')
+        node = roslaunch.core.Node('map_server', 'map_saver', args='../catkin_ws/RoboticsTeam31/maps -f task5_map')
         launch = roslaunch.scriptapi.ROSLaunch()
         launch.start()
         launch.launch(node)

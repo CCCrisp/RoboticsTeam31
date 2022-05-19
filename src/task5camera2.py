@@ -96,7 +96,7 @@ class colour_search(object):
                     colour_search.show_and_save_image(cv_img, "the_beacon")
 
     def show_and_save_image(img, img_name):
-        base_image_path = Path("home/student/catkin_ws/src/RoboticsTeam31/snaps")
+        base_image_path = Path("../catkin_ws/src/RoboticsTeam31/snaps")
         full_image_path = base_image_path.joinpath(f"{img_name}.jpg")
 
         cv2.imshow(img_name, img)

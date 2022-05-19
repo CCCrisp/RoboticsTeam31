@@ -73,19 +73,21 @@ class SearchActionServer(object):
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
                 
-            elif self.tb3_lidar.TurnLeft: 
-                turning = 0.2
-                goal.fwd_velocity = 0.0
-                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
-                self.vel_controller.publish()
-                time.sleep(1)
+            elif self.tb3_lidar.TurnLeft:
+                while self.tb3_lidar.min_distance <= goal.approach_distance: 
+                    turning = 0.2
+                    goal.fwd_velocity = 0.0
+                    self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                    self.vel_controller.publish()
+                    
 
             else :
-                turning = -0.2
-                goal.fwd_velocity = 0.0
-                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
-                self.vel_controller.publish()
-                time.sleep(1)
+                while self.tb3_lidar.min_distance <= goal.approach_distance:
+                    turning = -0.2
+                    goal.fwd_velocity = 0.0
+                    self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                    self.vel_controller.publish()
+                    
             
             
             # cancel if the time has elapsed
