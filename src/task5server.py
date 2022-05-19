@@ -70,7 +70,6 @@ class SearchActionServer(object):
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-                
             
             
             # cancel if the time has elapsed
