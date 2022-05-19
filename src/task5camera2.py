@@ -19,16 +19,15 @@ class colour_search(object):
 
     cvbridge_interface = CvBridge()
     def __init__(self):
+        
         node_name = "task5camera2"
-        rospy.init_node(node_name)
+        rospy.init_node(node_name,anonymous=True)
 
         
         cli = argparse.ArgumentParser(description=f"Command-line interface for the '{node_name}' node.")
         cli.add_argument("target_colour", metavar="COL", default="Blue", help="The name of a colour (for example)")
         
         self.args = cli.parse_args(rospy.myargv())
-
-        self.pub = rospy.Publisher(node_name, Image, self.camera_callback)
 
         self.camera_subscriber = rospy.Subscriber("/camera/rgb/image_raw",Image, self.camera_callback)
 
@@ -39,20 +38,25 @@ class colour_search(object):
         self.m00 = 0
         self.m00_min = 10000
 
+        self.ctrl_c = False
+
         # Thresholds for ["Blue", "Red", "Green", "Yellow"]
         self.lower = [(115, 224, 100), (0, 185, 100), (25, 150, 100), (25, 150, 100)]
         self.upper = [(130, 255, 255), (10, 255, 255), (70, 255, 255), (30, 190, 255)]
 
     def shutdown_ops(self):
+        
         self.robot_controller.stop()
         cv2.destroyAllWindows()
-        self.ctrl_c = False
+        self.ctrl_c = True
     
     def camera_callback(self, img_data):
+        
         try:
             cv_img = self.cvbridge_interface.imgmsg_to_cv2(img_data, desired_encoding="bgr8")
         except CvBridgeError as e:
             print(e)
+        
         
         height, width, _ = cv_img.shape
         crop_width = width - 800
@@ -64,6 +68,7 @@ class colour_search(object):
         hsv_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2HSV)
 
         # create a single mask to accommodate all four dectection colours:
+        
         for i in range(4):
             if i == 0:
                 mask = cv2.inRange(hsv_img, self.lower[i], self.upper[i])
@@ -83,8 +88,8 @@ class colour_search(object):
         if self.m00 > self.m00_min:
             cv2.circle(crop_img, (int(self.cy), 200), 10, (0, 0, 255), 2)
         
-        cv2.imshow('cropped image', crop_img)
-        cv2.waitKey(0)
+        #cv2.imshow('cropped image', crop_img)
+        #cv2.waitKey(0)
         if self.m00 > self.m00_min:
                 # blob detected
                 if self.cy >= 560-100 and self.cy <= 560+100:
@@ -105,7 +110,8 @@ class colour_search(object):
 
     def main(self):
         while not self.ctrl_c:
-            self.pub.publish()
+            
+            rospy.Subscriber("/camera/rgb/image_raw",Image, self.camera_callback)
             self.rate.sleep()
 
         
