@@ -44,7 +44,7 @@ class action_client(object):
 
     def main(self):
         
-        self.send_goal(velocity = 0.15, approach = 0.275)
+        self.send_goal(velocity = 0.15, approach = 0.35)
         
         while not self.ctrl_c:
             continue

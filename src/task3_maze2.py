@@ -6,10 +6,7 @@ from sensor_msgs.msg import LaserScan
 from nav_msgs.msg import Odometry
 import numpy as np
 from tf.transformations import euler_from_quaternion
-<<<<<<< HEAD
 import time
-=======
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
 class Task3Maze():
 
@@ -31,7 +28,6 @@ class Task3Maze():
         self.object_angle = 0
         self.ctrl_c = False
 
-<<<<<<< HEAD
         self.backleft_distance = 0
         self.backright_distance = 0
 
@@ -41,8 +37,6 @@ class Task3Maze():
         self.max_left_distance = 0
         self.max_right_distance = 0
 
-=======
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
         self.vel.linear.x = 0.0
         self.vel.angular.z = 0.0
 
@@ -64,13 +58,7 @@ class Task3Maze():
         
 
     def main_loop(self):
-<<<<<<< HEAD
         dist = 0.35
-=======
-        dist = 0.3
-        left_dist = 0.3
-        right_dist = 0.3
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
         
         while not self.ctrl_c:
             # while self.object_angle != 0:
@@ -82,7 +70,6 @@ class Task3Maze():
             
             
             
-<<<<<<< HEAD
             # while self.object_angle != 0:
             #     # print(self.max_distance)
             #     # print(self.object_angle)
@@ -163,82 +150,12 @@ class Task3Maze():
 
             self.velocity_publisher.publish(self.vel)
             self.rate.sleep()
-=======
-            while self.object_angle != 0:
-                # print(self.max_distance)
-                # print(self.object_angle)
-                if self.object_angle > 0:
-                    print("Turning right")
-                    self.turn_right()
-                else:
-                    print("Turning left")
-                    self.turn_left() 
-            
-                print("Moving forward")
-                self.move_forward()
-
-                self.velocity_publisher.publish(self.vel)
-                self.rate.sleep()
-
-
-            # # If there is no wall close to your front, left and right then find a wall
-            # if self.front_distance > dist and self.left_distance > left_dist and self.right_distance > right_dist:
-            #     print("Finding wall 1")
-            #     self.find_wall()
-            #     # self.new_angle = 0
-            #     # while self.new_angle != 0:
-            #     #     self.turn_right()
-            #     #     self.new_angle = self.object_angle
-            #     # self.move_forward()
-            
-            # # If there only is a wall close enough to the right but not the front or the left then follow the wall
-            # elif self.front_distance > dist and self.left_distance > left_dist and self.right_distance < right_dist:
-            #     print("Following wall 2")
-            #     self.follow_wall()
-            
-            # # If there only is a wall close enough to the left but not the front and the right then find a wall
-            # elif self.front_distance > dist and self.left_distance < left_dist and self.right_distance > right_dist:
-            #     print("Turning right 3")
-            #     self.turn_right()
-
-            # # If there is a wall close to your left and right but not the front then follow the right wall by moving forwards
-            # elif self.front_distance > dist and self.left_distance < left_dist and self.right_distance < right_dist:
-            #     print("Following wall 4")
-            #     self.follow_wall()
-                
-            # # If there is a wall close to your front but not the left or the right then turn left to then have a wall to the right  
-            # elif self.front_distance < dist and self.left_distance > left_dist and self.right_distance > right_dist:
-            #     print("Turning left 5")
-            #     self.turn_left()
-
-            # # If there is a wall close to your front and right but not the left then turn left
-            # elif self.front_distance < dist and self.left_distance > left_dist and self.right_distance < right_dist:
-            #     print("Turning left 6")
-            #     # print("Front distance at")
-            #     # print(self.front_distance)
-            #     self.turn_left()
-                
-            # # If there is a wall close to the front and left but not the right then turn right? or left?
-            # elif self.front_distance < dist and self.left_distance < left_dist and self.right_distance > right_dist:
-            #     # print("Turning left 7")
-            #     print("Turning right 7")
-            #     self.turn_right()
-                
-            # # If there is a wall close to the front and left and right then turn around? or left?
-            # elif self.front_distance < dist and self.left_distance < dist and self.right_distance < dist:
-            #     print("Turning right 8")
-            #     self.turn_right()
-
-            # self.velocity_publisher.publish(self.vel)
-            # self.rate.sleep()
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
     
 
     def callback_lidar(self, lidar_data):
         # Obtain a subset of the LaserScan.ranges array corresponding to a +/-10 degree arc in front of it. Convert this subset to a numpy array to allow for more advanced processing.
 
-<<<<<<< HEAD
         # left_arc = lidar_data.ranges[0:30]
         left_arc = lidar_data.ranges[0:20]
         # left_arc = lidar_data.ranges[90]
@@ -255,29 +172,16 @@ class Task3Maze():
         self.min_distance = front_arc.min()
 
         arc_angles = np.arange(-20, 20)
-=======
-        left_arc = lidar_data.ranges[0:45]
-        # left_arc = lidar_data.ranges[90]
-        right_arc = lidar_data.ranges[-45:]
-        # right_arc = lidar_data.ranges[-90]
-        front_arc = np.array(left_arc[::-1] + right_arc[::-1])
-        self.min_distance = front_arc.min()
-
-        arc_angles = np.arange(-45, 45)
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
         self.object_angle = arc_angles[np.argmax(front_arc)]
 
         # find the miniumum object distance within the frontal laserscan arc:
         self.front_distance = np.array(front_arc).min()
         self.left_distance = np.array(left_arc).min()
         self.right_distance = np.array(right_arc).min()
-<<<<<<< HEAD
         # self.left_middle_distance = np.array(left_middle_arc).min()
         # self.right_middle_distance = np.array(right_middle_arc).min()
         # self.backleft_distance = np.array(backleft_arc).min()
         # self.backright_distance = np.array(backright_arc).min()
-=======
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
         self.max_front_distance = np.array(front_arc).max()
         self.max_left_distance = np.array(left_arc).max()
@@ -291,7 +195,6 @@ class Task3Maze():
     def find_wall(self): 
         self.vel = Twist()
         self.vel.linear.x = 0.1
-<<<<<<< HEAD
         self.vel.angular.z = -0.1
 
 
@@ -315,22 +218,6 @@ class Task3Maze():
             self.vel.angular.z = -0.3
             self.velocity_publisher.publish(self.vel)
             self.rate.sleep()
-=======
-        # self.vel.angular.z = -0.1
-
-
-    def turn_left(self):
-        self.vel = Twist()
-        # self.vel.linear.x = 0
-        self.vel.angular.z = 0.3
-
-
-    def turn_right(self):
-        self.vel = Twist()
-        # self.vel.linear.x = 0
-        # self.vel.linear.x = -0.1
-        self.vel.angular.z = -0.3
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
     
     def turn_back(self):
@@ -346,13 +233,8 @@ class Task3Maze():
 
     def move_forward(self):
         self.vel = Twist()
-<<<<<<< HEAD
         # self.vel.angular.z = 0
         self.vel.linear.x = 0.1
-=======
-        self.vel.angular.z = 0
-        self.vel.linear.x = 0.3
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075
 
     # def turn_robot(self, angle):
         # self.vel = Twist()
@@ -383,7 +265,6 @@ if __name__ == '__main__':
 #     pos_z = odom_data.pose.pose.position.z
 
 #     (roll, pitch, yaw) = euler_from_quaternion([or_x, or_y, or_z, or_w], 'sxyz')
-<<<<<<< HEAD
 
 
 
@@ -404,5 +285,3 @@ turn until yaw is
 
 
 """
-=======
->>>>>>> 04d57d57cd02d8fd1cee53860377db42575b4075

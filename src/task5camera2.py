@@ -1,7 +1,9 @@
 #! /usr/bin/python3
 
 # Import the core Python modules for ROS and to implement ROS Actions:
+
 import rospy
+import argparse
 
 # Import some image processing modules:
 import cv2
@@ -11,34 +13,26 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 
 # Import some other modules from within this package
-from tb3 import Tb3Move
-from geometry_msgs.msg import Twist
+from pathlib import Path
 
 class colour_search(object):
 
-    print(f"{object.target_colour}")
-
+    cvbridge_interface = CvBridge()
     def __init__(self):
-        node_name = "turn_and_face"
+        node_name = "task5camera2"
         rospy.init_node(node_name)
 
-        self.camera_subscriber = rospy.Subscriber("/camera/rgb/image_raw",
-            Image, self.camera_callback)
-        self.velocity_publisher = rospy.Publisher("/cmd_vel", Twist, self.callback_lidar)
+        
+        cli = argparse.ArgumentParser(description=f"Command-line interface for the '{node_name}' node.")
+        cli.add_argument("target_colour", metavar="COL", default="Blue", help="The name of a colour (for example)")
+        
+        self.args = cli.parse_args(rospy.myargv())
+
+        self.pub = rospy.Publisher(node_name, Image, self.camera_callback)
+
+        self.camera_subscriber = rospy.Subscriber("/camera/rgb/image_raw",Image, self.camera_callback)
+
         self.cvbridge_interface = CvBridge()
-
-        self.robot_controller = Tb3Move()
-        self.turn_vel_fast = -0.5
-        self.turn_vel_slow = -0.1
-        self.robot_controller.set_move_cmd(0.0, self.turn_vel_fast)
-
-        self.move_rate = "" # fast, slow or stop
-        self.stop_counter = 0
-
-        self.vel = Twist()
-
-        self.ctrl_c = False
-        rospy.on_shutdown(self.shutdown_ops)
 
         self.rate = rospy.Rate(5)
         
@@ -52,7 +46,7 @@ class colour_search(object):
     def shutdown_ops(self):
         self.robot_controller.stop()
         cv2.destroyAllWindows()
-        self.ctrl_c = True
+        self.ctrl_c = False
     
     def camera_callback(self, img_data):
         try:
@@ -90,14 +84,35 @@ class colour_search(object):
             cv2.circle(crop_img, (int(self.cy), 200), 10, (0, 0, 255), 2)
         
         cv2.imshow('cropped image', crop_img)
+        cv2.waitKey(0)
+        if self.m00 > self.m00_min:
+                # blob detected
+                if self.cy >= 560-100 and self.cy <= 560+100:
+                    colour_search.show_and_save_image(cv_img, "the_beacon")
+
+    def show_and_save_image(img, img_name):
+        base_image_path = Path("home/student/catkin_ws/src/RoboticsTeam31/snaps")
+        full_image_path = base_image_path.joinpath(f"{img_name}.jpg")
+
+        cv2.imshow(img_name, img)
         cv2.waitKey(1)
 
+        cv2.imwrite(str(full_image_path), img)
+        print(f"Saved an image to '{full_image_path}'\n"
+            f"image dims = {img.shape[0]}x{img.shape[1]}px\n"
+            f"file size = {full_image_path.stat().st_size} bytes")
+
+
     def main(self):
-        if object.target_colour == "blue":
-            x =1
-        elif object.target_colour == "blue":
-            x =1
-        elif object.target_colour == "blue":
-            x =1
-        elif object.target_colour == "blue":
-            x =1
+        while not self.ctrl_c:
+            self.pub.publish()
+            self.rate.sleep()
+
+        
+
+if __name__ == '__main__':
+    search_instance = colour_search()
+    try:
+        search_instance.main()
+    except rospy.ROSInterruptException:
+        pass

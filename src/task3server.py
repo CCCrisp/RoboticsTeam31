@@ -29,8 +29,8 @@ class SearchActionServer(object):
         self.tb3_lidar = Tb3LaserScan()
     
     def scan_callback(self, scan_data):
-        left_arc = scan_data.ranges[0:21]
-        right_arc = scan_data.ranges[-20:]
+        left_arc = scan_data.ranges[0:10]
+        right_arc = scan_data.ranges[-10:]
         front_arc = np.array(left_arc[::-1] + right_arc[::-1])
         self.min_distance = front_arc.min()
         self.object_angle = self.arc_angles[np.argmin(front_arc)]
@@ -67,27 +67,25 @@ class SearchActionServer(object):
         self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
         self.vel_controller.publish()
 
-        self.tb3_lidar.TurnLeft = False
+        self.tb3_lidar.TurnLeft1 = False
         while success:
             if self.tb3_lidar.min_distance > goal.approach_distance:
                 turning = 0
-                goal.fwd_velocity = 0.4
+                goal.fwd_velocity = 0.3
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
                 
-            elif self.tb3_lidar.TurnLeft: 
-                turning = 0.2
+            elif self.tb3_lidar.TurnLeft1: 
+                turning = 0.25
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-                time.sleep(1)
 
-            else :
-                turning = -0.2
+            else:
+                turning = -0.25
                 goal.fwd_velocity = 0.0
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-                time.sleep(1)
             
             
             # check if there has been a request to cancel the action mid-way through:

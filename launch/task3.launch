@@ -1,4 +1,6 @@
 <launch>
-  <node pkg="team31" type="task3_maze2.py" name="task3"  output="screen">
-  </node>
+    <node pkg="team31" type="task3server.py" name="task3server"  output="screen">
+    </node>
+    <node pkg="team31" type="task3client.py" name="task3client" output="screen">
+    </node>
 </launch>

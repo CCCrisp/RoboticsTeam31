@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import sys
+import argparse
 import rospy
 from pathlib import Path
 
@@ -10,8 +10,6 @@ from cv_bridge import CvBridge, CvBridgeError
 from sensor_msgs.msg import Image
 
 
-myargv = rospy.myargv()
-print (f"{myargv}")
 node_name = "object_detection_node"
 rospy.init_node(node_name)
 print(f"Launched the '{node_name}' node. Currently waiting for an image...")
