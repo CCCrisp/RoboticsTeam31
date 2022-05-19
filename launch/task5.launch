@@ -4,4 +4,7 @@
     </node>
     <node pkg="team31" type="task5client.py" name="task5client" output="screen">
     </node>
+    <node pkg="team31" type="task5camera.py" name="task5camera" output="screen">
+    </node>
+    <arg name="target_colour" default="red" />
 </launch>

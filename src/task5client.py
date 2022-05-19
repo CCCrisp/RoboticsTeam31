@@ -32,10 +32,6 @@ class action_client(object):
 
     def shutdown_ops(self):
         self.client.cancel_goal()
-        node = roslaunch.core.Node('map_server', 'map_saver', args='home/student/catkin_ws/src/RoboticsTeam31/maps/ -f task5_map')
-        launch = roslaunch.scriptapi.ROSLaunch()
-        launch.start()
-        launch.launch(node)
         self.ctrl_c = True
             
             
@@ -54,21 +50,13 @@ class action_client(object):
             continue
         rospy.loginfo("stopping")
 
-        node = roslaunch.core.Node('map_server', 'map_saver', args='home/student/catkin_ws/src/RoboticsTeam31/maps/ -f task5_map')
+        node = roslaunch.core.Node('map_server', 'map_saver', args='$(find team31)/maps -f task5_map')
         launch = roslaunch.scriptapi.ROSLaunch()
         launch.start()
         launch.launch(node)
+        print(f"saving to maps file")
         
         self.shutdown_ops
-    
-    def exit_handler():
-        node = roslaunch.core.Node('map_server', 'map_saver', args='home/student/catkin_ws/src/RoboticsTeam31/maps/ -f task5_map')
-        launch = roslaunch.scriptapi.ROSLaunch()
-        launch.start()
-        launch.launch(node)
-
-
-    atexit.register(exit_handler)
         
         
 

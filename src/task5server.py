@@ -1,8 +1,15 @@
 #! /usr/bin/python3
 
 # Import the core Python modules for ROS and to implement ROS Actions:
+from http.client import ImproperConnectionState
 import rospy
 import actionlib
+
+# Import some image processing modules:
+import cv2
+from cv_bridge import CvBridge, CvBridgeError
+from pathlib import Path
+from sensor_msgs.msg import Image
 
 # Import all the necessary ROS message types:
 from com2009_msgs.msg import SearchFeedback, SearchResult, SearchAction, SearchGoal
@@ -18,6 +25,7 @@ import time
 class SearchActionServer(object):
     feedback = SearchFeedback() 
     result = SearchResult()
+    cvbridge_interface = CvBridge()
 
     def __init__(self):
         self.actionserver = actionlib.SimpleActionServer("/search_action_server", 
@@ -28,6 +36,11 @@ class SearchActionServer(object):
         self.tb3_odom = Tb3Odometry()
         self.tb3_lidar = Tb3LaserScan()
         self.start_time = rospy.get_time()
+
+        
+        # Thresholds for ["Blue", "Red", "Green", "Yellow"]
+        self.lower = [(115, 224, 100), (0, 185, 100), (25, 150, 100), (25, 150, 100)]
+        self.upper = [(130, 255, 255), (10, 255, 255), (70, 255, 255), (30, 190, 255)]
     
     def scan_callback(self, scan_data):
         left_arc = scan_data.ranges[0:5]
@@ -35,6 +48,7 @@ class SearchActionServer(object):
         front_arc = np.array(left_arc[::-1] + right_arc[::-1])
         self.min_distance = front_arc.min()
         self.object_angle = self.arc_angles[np.argmin(front_arc)]
+
     
     def action_server_launcher(self, goal: SearchGoal):
         r = rospy.Rate(10)
@@ -75,7 +89,7 @@ class SearchActionServer(object):
             
             
             # cancel if the time has elapsed
-            if rospy.get_time() - self.start_time >= 180:
+            if rospy.get_time() - self.start_time >= 10:
                 break
             
             self.distance = sqrt(pow(self.posx0 - self.tb3_odom.posx, 2) + pow(self.posy0 - self.tb3_odom.posy, 2))
