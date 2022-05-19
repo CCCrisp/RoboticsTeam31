@@ -74,19 +74,22 @@ class SearchActionServer(object):
                 goal.fwd_velocity = 0.3
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
-                
-            elif self.tb3_lidar.TurnLeft1: 
-                turning = 0.25
-                goal.fwd_velocity = 0.0
-                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
-                self.vel_controller.publish()
-
+                        
             else:
-                turning = -0.25
-                goal.fwd_velocity = 0.0
-                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
-                self.vel_controller.publish()
-            
+                if self.tb3_lidar.TurnLeft1:
+                    while self.tb3_lidar.min_distance <= goal.approach_distance:
+                        turning = 0.25
+                        goal.fwd_velocity = 0.0
+                        self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                        self.vel_controller.publish()
+                    
+                else:
+                    while self.tb3_lidar.min_distance <= goal.approach_distance:
+                        turning = -0.25
+                        goal.fwd_velocity = 0.0
+                        self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                        self.vel_controller.publish()
+                    
             
             # check if there has been a request to cancel the action mid-way through:
             if self.actionserver.is_preempt_requested():

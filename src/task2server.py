@@ -68,7 +68,7 @@ class SearchActionServer(object):
         self.vel_controller.publish()
 
         self.tb3_lidar.TurnLeft = False
-        while not success:
+        while success:
             if self.tb3_lidar.min_distance > goal.approach_distance:
                 turning = 0
                 goal.fwd_velocity = 0.4

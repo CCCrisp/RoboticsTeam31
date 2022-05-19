@@ -61,13 +61,17 @@ class Tb3LaserScan(object):
         self.max_right_distance = np.array(right_middle_arc).max()
         self.min_left_distance = np.array(left_middle_arc).min()
         self.min_right_distance = np.array(right_middle_arc).min()
-       
+
+        if self.min_left_distance < 0.3:
+            self.TurnLeft1 = False
+        elif self.min_right_distance < 0.3:
+            self.TurnLeft1 = True
+        
         if self.max_left_distance > self.max_right_distance :
             self.TurnLeft1 = True
         elif self.max_left_distance > self.max_right_distance :
             self.TurnLeft1 = False
-        else:
-            print (...)
+        
         
         if self.min_distance in right_arc:
             self.TurnLeft = True
