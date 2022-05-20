@@ -28,13 +28,7 @@ class SearchActionServer(object):
         self.tb3_odom = Tb3Odometry()
         self.tb3_lidar = Tb3LaserScan()
     
-    def scan_callback(self, scan_data):
-        left_arc = scan_data.ranges[0:10]
-        right_arc = scan_data.ranges[-10:]
-        front_arc = np.array(left_arc[::-1] + right_arc[::-1])
-        self.min_distance = front_arc.min()
-        self.object_angle = self.arc_angles[np.argmin(front_arc)]
-    
+
     def action_server_launcher(self, goal: SearchGoal):
         r = rospy.Rate(10)
 
