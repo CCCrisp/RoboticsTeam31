@@ -43,8 +43,8 @@ class SearchActionServer(object):
         self.upper = [(130, 255, 255), (10, 255, 255), (70, 255, 255), (30, 190, 255)]
     
     def scan_callback(self, scan_data):
-        left_arc = scan_data.ranges[0:10]
-        right_arc = scan_data.ranges[-10:]
+        left_arc = scan_data.ranges[0:20]
+        right_arc = scan_data.ranges[-20:]
         front_arc = np.array(left_arc[::-1] + right_arc[::-1])
         self.min_distance = front_arc.min()
         self.object_angle = self.arc_angles[np.argmin(front_arc)]
@@ -69,27 +69,33 @@ class SearchActionServer(object):
         while success:
             if self.tb3_lidar.min_distance > goal.approach_distance:
                 turning = 0
-                goal.fwd_velocity = 0.1
+                goal.fwd_velocity = 0.15
                 self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
                 self.vel_controller.publish()
                 
-            elif self.tb3_lidar.TurnLeft: 
-                turning = 0.2
-                goal.fwd_velocity = 0.0
-                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
-                self.vel_controller.publish()
-                time.sleep(1)
+            elif self.tb3_lidar.TurnLeft:
+                while self.tb3_lidar.min_distance <= goal.approach_distance: 
+                    turning = 0.2
+                    goal.fwd_velocity = 0.0
+                    self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                    self.vel_controller.publish()
+                    
 
             else :
-                turning = -0.2
-                goal.fwd_velocity = 0.0
-                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
-                self.vel_controller.publish()
-                time.sleep(1)
+                while self.tb3_lidar.min_distance <= goal.approach_distance:
+                    turning = -0.2
+                    goal.fwd_velocity = 0.0
+                    self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                    self.vel_controller.publish()
+                    
             
             
             # cancel if the time has elapsed
             if rospy.get_time() - self.start_time >= 180:
+                goal.fwd_velocity = 0.0
+                turning = 0.0
+                self.vel_controller.set_move_cmd(goal.fwd_velocity, turning)
+                self.vel_controller.publish()
                 break
             
             self.distance = sqrt(pow(self.posx0 - self.tb3_odom.posx, 2) + pow(self.posy0 - self.tb3_odom.posy, 2))
